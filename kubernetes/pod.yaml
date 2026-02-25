@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  namespace: webhook-system
+  labels:
+    app.kubernetes.io/name: myapp
+    init-inject: "true"
+    app: logging-sidecar
+  annotations:
+    sidecar-inject: "logging"
+spec:
+  containers:
+  - name: myapp
+    image: djkormo/init-injector:latest
+    imagePullPolicy: IfNotPresent
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+      requests:
+        memory: 50Mi
+        cpu: 20m
+    ports:
+      - containerPort: 8443

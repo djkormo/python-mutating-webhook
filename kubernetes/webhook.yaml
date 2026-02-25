@@ -1,0 +1,32 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: init-injector-webhook
+webhooks:
+- name: init-injector.example.com
+  admissionReviewVersions: ["v1"]
+  sideEffects: None
+  timeoutSeconds: 10
+  failurePolicy: Fail #Ignore  # Use Fail in prod
+  matchPolicy: Equivalent
+  rules:
+  - operations: ["CREATE"]
+    apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["pods"]
+    scope: "Namespaced"
+  clientConfig:
+    service:
+      name: init-injector
+      namespace: webhook-system
+      path: "/mutate"
+      port: 443
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURDekNDQWZPZ0F3SUJBZ0lVY3JDSldTV1ZxU0poclRwT0FIOVFXank4WWhVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0ZURVRNQkVHQTFVRUF3d0tkMlZpYUc5dmF5MWpZVEFlRncweU5qQXlNak15TWpNeU1UbGFGdzB6TmpBeQpNakV5TWpNeU1UbGFNQlV4RXpBUkJnTlZCQU1NQ25kbFltaHZiMnN0WTJFd2dnRWlNQTBHQ1NxR1NJYjNEUUVCCkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDdkU1MUNYWER3OG5pUlExNEJWeGgyZ3pNeVpJVERiZHBjblFRcEo4Q3QKeitQeWRWU1lwZm5qbm93Q2ljd29taVhQNElGVUw3WWM3Ylg1TFh3WnJXcjMwdkxHZStGODNwZWpERDhLT1d3egpENlZTZ1hWTDFwOTQrdDQ5SWM2YzU1cFRiaWExa3lqdmg0cGcvOVludEorZUkvOG9ERTJUblJ2TFV0dklVWjMzCmNRY2VFaTMxMlN6OFJxZU1IYiszdERCWVRza3FzbTNIZzJsYnNNS0l0ZEtaN2R2cXRqd1puS1JTVzhZQzEwaEYKN0sxNWlyT0g1UkFqU3VEZG4xYzFkemRETVNoQ0N6K3poVnhGUEhObVRXTFNTQjErdVdhVXVyS3NXUzBPcUxvUwp5T0czeE51aU5WbzU4N0FtVVNMTmNCc3hxMTlOTHFRR1VacW5NVmwrK09FTkFnTUJBQUdqVXpCUk1CMEdBMVVkCkRnUVdCQlJKZm8wVXBrVVJRSWJteGprRXp1d3FJRnAxcGpBZkJnTlZIU01FR0RBV2dCUkpmbzBVcGtVUlFJYm0KeGprRXp1d3FJRnAxcGpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFCNwpVTG5oY3VSaWlsV1Y1TG9tcCtIbFgwd3NZWlpkU3NoZ1FZMGNLMVFJa0EvdDh4ZFh2aXZ5TEVlcW5tSnlGV1JyCmdMWUFqZGJlR0NmQ0pnY0xUelVmVjlwajUzdHorWW05ZS9QYXRMakVqUlBMalRVdHFTNkhqZURBc25VTXJRQkEKQm4vRWRTa01vU3BKYyszcnA4TXUwNG82Z1ZlWUF4VDFsV21yMHNUZHJWUTJ5eDltZTRYQWRGK0t4SjF1UUs4bQp3aVZVS3lJRHBCelRpNkYwVDd1eWNFY3RzaXFWaUVSYjNXUVYyV0FSeGFVdlpoc3UyVmdQbWVOYVd1STRkdmwzCitab3cwYi96T2NWMXp3aXBjRE5YVTY0UmRZSTdvWHpBUzcyM0NDdDFEcklFL2lWbzRiZUxwL1lSTFNkM2I4K0sKYktJTnBSTDMzeFplbER4dWRaRFcKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo= #Cg==  #${CA_BUNDLE}  # Paste the base64 value here
+  objectSelector:
+    matchLabels:
+      init-inject: "true"  # ← Only pods with this label!
+  #namespaceSelector:
+  #  matchExpressions:
+  #  - key: init-injection
+  #    operator: In
+  #    values: ["enabled"]

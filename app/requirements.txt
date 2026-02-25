@@ -1,0 +1,7 @@
+
+fastapi==0.132.0
+uvicorn[standard]==0.41.0
+kubernetes==29.0.0
+pyyaml==6.0.2
+kr8s==0.20.15
+

@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-app-sidecar
+  namespace: webhook-system  # Webhook's namespace
+data:
+  sidecars.yaml: |
+    - name: logging-sidecar
+      matchLabels:
+        app.kubernetes.io/component: application-logging-sidecar
+      matchAnnotations:
+        sidecar-inject: "logging"
+      initContainers:
+        - name: log-init
+          image: busybox:1.36
+          command: ["sh", "-c", "echo Preparing logs && sleep 2"]
+      containers:
+        - name: fluentbit
+          image: fluent/fluent-bit:3.1.6
+          env:
+            - name: LOG_PATH
+              value: "/var/log/app"
+          volumeMounts:
+            - name: app-logs
+              mountPath: /var/log/app
+      volumes:
+        - name: app-logs
+          emptyDir: {}
+    
+    - name: monitoring-sidecar
+      matchLabels:
+        app.kubernetes.io/component: backend-for-monitoring
+      initContainers: []
+      containers:
+        - name: chess-exporter
+          image: djkormo/chess-ai
+      volumes: []

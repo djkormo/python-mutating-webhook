@@ -1,0 +1,20 @@
+{
+  "apiVersion": "admission.k8s.io/v1",
+  "kind": "AdmissionReview",
+  "request": {
+    "uid": "test",
+    "kind": { "group": "", "version": "v1", "kind": "Pod" },
+    "resource": { "group": "", "version": "v1", "resource": "pods" },
+    "operation": "CREATE",
+    "object": {
+      "metadata": {
+        "name": "foo",
+        "namespace": "default",
+        "labels": { "init-injection": "enabled" }  
+      },
+      "spec": {
+        "containers": [{ "name": "busy", "image": "busybox" }]
+      }
+    }
+  }
+}

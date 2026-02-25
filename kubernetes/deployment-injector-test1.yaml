@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: injector-test1
+  namespace: webhook-system
+  labels:
+    app: injector-test1
+  annotations:
+    webhook-config.configmap-name: "my-app-sidecar"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: injector-test1
+      init-inject: "true"
+      app.kubernetes.io/component: backend-for-monitoring
+  template:
+    metadata:
+      labels:
+        app: injector-test1
+        init-inject: "true"
+        app.kubernetes.io/component: backend-for-monitoring
+      annotations:
+        sidecar-inject: "logging"
+    spec:
+      serviceAccountName: init-injector-sa
+      containers:
+      - name: webhook
+        image: djkormo/init-injector:latest # Build/push your FastAPI image
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+          allowPrivilegeEscalation: false
+        ports:
+        - containerPort: 8443
+          name: https
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
+        volumeMounts:
+        - name: tls
+          mountPath: /etc/webhook/certs
+          readOnly: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+          initialDelaySeconds: 15
+          periodSeconds: 60
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+          initialDelaySeconds: 5
+          periodSeconds: 60
+      volumes:
+      - name: tls
+        secret:
+          secretName: webhook-tls-secret
