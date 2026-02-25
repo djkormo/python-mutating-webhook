@@ -75,3 +75,18 @@ kubectl -n webhook-system create secret tls webhook-tls-secret \
 kubectl -n webhook-system logs deploy/init-injector
 
 ```
+
+
+
+Literature:
+
+
+
+https://www.civo.com/learn/kubernetes-admission-controllers-for-beginners
+https://mikeluttikhuis.nl/2024/11/exploring-mutating-webhooks-in-kubernetes/
+
+https://dev.to/ineedale/writing-a-very-basic-kubernetes-mutating-admission-webhook-5b1
+
+https://medium.com/@LachlanEvenson/mutating-kubernetes-resources-with-gatekeeper-3e5585d49ead
+
+https://kmitevski.com/kubernetes-mutating-webhook-with-python-and-fastapi/
